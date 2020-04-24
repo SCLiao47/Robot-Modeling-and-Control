@@ -18,10 +18,6 @@ function xdot = RR_dynamics(t,x,controller,refFun)
     xdot(2) = RR_thdd1(I1,I2,g,l1,lc1,lc2,m1,m2,tau(1),tau(2),x(1),x(3),x(2),x(4));
     xdot(3) = x(4);
     xdot(4) = RR_thdd2(I1,I2,g,l1,lc1,lc2,m1,m2,tau(1),tau(2),x(1),x(3),x(2),x(4));
-    
-%     global logger
-%     logger = [logger;
-%               t, ref, e1, e2, tau(1), tau(2)];
 end
 
 function out1 = RR_thdd1(I1,I2,g,l1,lc1,lc2,m1,m2,tau1,tau2,th1,th2,thd1,thd2)

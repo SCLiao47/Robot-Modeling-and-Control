@@ -26,10 +26,13 @@ ini = 0.05;
 x0 = [ini,0,ini,0];
 
 % Controller
-controller = @PDcontroller;
+controller = @PD_controller;
+controller = @PDFF_controller;
+controller = @InvDyn_controller;
 
 % Reference Signal
 refFun = @(t) deal((t<1)*pi/2,0,0);
+refFun = @CubicPath;
 
 % simulation with ode!
 [t, y] = ode45(@(t,x) RR_dynamics(t,x,controller,refFun), tspan, x0);
