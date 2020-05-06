@@ -1,42 +1,51 @@
-function RR_Animation(t,y,refFun,l1,l2,file_name,export_video)
-    %% Animation use
-    % plotting the robot in wrokspace!
-    % === require data ===
-    %   y (th1, th2)
-    %   l1, l2
-    %   refFun
-    %   t
-
+function visualization(t,y,ref,e,tau,file_name,export_video)
+    global l1 l2
+    
     frame_rate = 30;
-
+    
     %% Interpolation for linear time
     tspan = t(end) - t(1);
     t_lin = linspace(t(1), t(end), tspan*frame_rate);
-
-
-    %% position of end-effector
-    % q1 = [x1,y1,z1,1]
+    
     q1_lin = interp1(t,y(:,1),t_lin,'spline')';
     q2_lin = interp1(t,y(:,3),t_lin,'spline')';
     [p1,p2] = RR_EndEffector(l1,l2,q1_lin,q2_lin);
-
-    % reference
-    [q_ref,v_ref,a_ref] = refFun(t);
-    q_ref = interp1(t,q_ref,t_lin,'spline')';
-
-    [p1_ref, p2_ref] = RR_EndEffector(l1,l2,q_ref,q_ref);
-
-
-    fig = figure;
-
+    
+    q_ref_lin = interp1(t,ref,t_lin,'spline')';
+    [p1_ref, p2_ref] = RR_EndEffector(l1,l2,q_ref_lin,q_ref_lin);
+    
+    e_lin = interp1(t,e,t_lin,'spline')';
+    tau_lin = interp1(t,tau,t_lin,'spline')';
+    
+    %% plotting
+%     fig = figure('position',[200,50,800,600]);
+    fig = figure('position',get(0,'ScreenSize'));
+    
+    plotting(t,y,ref,e,tau,4);
+    
+    subplot(3,4,4);
+    ph_q1 = plot(t_lin(1),q1_lin(1),'b*');
+    ph_q2 = plot(t_lin(1),q2_lin(1),'r*');
+    legend off
+    
+    subplot(3,4,8);
+    ph_e1 = plot(t_lin(1),e_lin(1,1),'b*');
+    ph_e2 = plot(t_lin(1),e_lin(2,1),'r*');
+    legend off
+    
+    subplot(3,4,12);
+    ph_tau1 = plot(t_lin(1),tau_lin(1,1),'b*');
+    ph_tau2 = plot(t_lin(1),tau_lin(2,1),'r*');
+    legend off
     
     if export_video
         movieVector(length(t_lin)) = getframe;
     end
     
     for i = 1:length(t_lin)
+        subplot(3,4,[1,11]);
         % clear the figure
-        clf;
+%         clf;
 
         ti = i;
 
@@ -53,7 +62,8 @@ function RR_Animation(t,y,refFun,l1,l2,file_name,export_video)
         title(['RR with controller PD and ref Step. t=',num2str(t_lin(i))]);
         xlim([-0.5,0.5]);
         ylim([-0.5,0.5]);
-
+        hold off;
+        
     %     pause(1.0/frame_rate*2)
         if export_video
             movieVector(i) = getframe(fig);
@@ -71,4 +81,4 @@ function RR_Animation(t,y,refFun,l1,l2,file_name,export_video)
 
         disp(['Video export at ', file_name,' Done!!']);
     end
-end
+end 
